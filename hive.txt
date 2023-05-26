@@ -1,0 +1,85 @@
+create table flight_info(
+year INT,
+month INT,
+day INT,
+day_of_week INT,
+dep_time INT,
+crs_dep_time INT,
+arr_time INT,
+crs_arr_time INT,
+unique_carryeaier STRING,
+flight_num INT,
+tail_num STRING,
+actual_elapsed_time INT,
+crs_elapsed_time INT,
+air_time INT,
+arr_delay INT,
+dep_delay INT,
+origin STRING,
+dest STRING,
+distance INT,
+taxi_in INT,
+taxi_out INT,
+cancelled INT,
+cancellation_code STRING,
+diverted INT,
+carrier_delay STRING,
+weather_delay STRING,
+nas_delay STRING,
+security_delay STRING,
+late_aircraft_delay STRING
+)
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ',';
+
+
+
+// Load data in hive
+
+LOAD DATA LOCAL INPATH '/home/cloudera/Downloads/flight_info.txt' INTO TABLE flight_info;
+
+
+// create table 2
+
+create table flight_info2 as select flight_num,
+origin,
+dest,
+arr_time,
+dep_time,
+arr_delay,
+dep_delay from flight_info;
+
+
+// create index 
+
+CREATE INDEX inedx_dest ON TABLE flight_info2(dest)
+AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler' WITH DEFERRED REBUILD;
+
+
+// show index 
+
+show formatted index on flight_info2;
+
+
+// Calculate avg of dep_delay
+
+select avg(dep_delay) as avg_dept_delay from flight_info2;
+
+
+// Calculate avg of arr_delay
+
+select avg(arr_delay) as avg_arr_delay from flight_info2;
+
+
+// Calculate Total no.of Flights 
+
+select count(*) as total_flights from flight_info2;
+
+
+// calculate flight where destination is India
+
+select * from flight_info2 where dest = 'IND';
+
+
+// calculate flight where origin is India
+select * from flight_info2 where origin = 'IND';
